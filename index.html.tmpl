@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>tracemod</title>
+  </head>
+  <body style="background:#202224;">
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.6.2-rc.3/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: true, logLevel: 1, maxEdges: 100000 });
+    </script>
+    <pre class="mermaid">
+    {{ . }}
+    </pre>
+  </body>
+</html>
