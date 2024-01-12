@@ -20,6 +20,10 @@ tracemod github.com/spf13/cobra
 
 ![tracemod example 1](./static/readme_example_1.png)
 
+### 📦 Installation
+
+- From GitHub: `go install github.com/aseure/tracemod@latest`
+
 ### ✨ Features
 
 #### ♾️  Limit the number of dependency paths
