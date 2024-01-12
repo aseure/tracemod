@@ -9,6 +9,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var Version string
+
 func main() {
 	var (
 		debug           bool
@@ -16,13 +18,18 @@ func main() {
 		maxTraces       uint
 		useFixedStrings bool
 		timeout         time.Duration
+		showVersion     bool
 	)
 
 	rootCmd := &cobra.Command{
 		Use:   "tracemod",
 		Short: "Trace a module dependency from a Go project",
-		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if showVersion {
+				fmt.Println(Version)
+				return nil
+			}
+
 			rootModule, err := detectRootModule()
 			if err != nil {
 				return err
@@ -69,6 +76,7 @@ func main() {
 	rootCmd.PersistentFlags().VarP(&direction, "direction", "d", `Direction of the dependency tree, defaults to "LR"`)
 	rootCmd.PersistentFlags().BoolVarP(&useFixedStrings, "fixed-strings", "F", false, "Treat all patterns as literals instead of as regular expressions.")
 	rootCmd.PersistentFlags().DurationVarP(&timeout, "timeout", "t", 30*time.Second, "Timeout duration")
+	rootCmd.PersistentFlags().BoolVarP(&showVersion, "version", "v", false, "Show program version")
 
 	if err := rootCmd.Execute(); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "failed to execute: %v", err)
