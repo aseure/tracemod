@@ -11,6 +11,7 @@ import (
 
 func main() {
 	var (
+		debug           bool
 		direction       Direction
 		maxTraces       uint
 		useFixedStrings bool
@@ -49,6 +50,11 @@ func main() {
 
 			diagram := generateMermaidDiagram(cancel, rootModule, isModuleMatching, direction, chains, maxTraces)
 
+			if debug {
+				fmt.Println(diagram)
+				return nil
+			}
+
 			filepath, err := generateHTML(diagram)
 			if err != nil {
 				return err
@@ -58,6 +64,7 @@ func main() {
 		},
 	}
 
+	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "D", false, "Show the Mermaid diagram instead of generating and opening the HTML rendering")
 	rootCmd.PersistentFlags().UintVarP(&maxTraces, "max-traces", "m", 0, "Limit the number of maximum traces to detect")
 	rootCmd.PersistentFlags().VarP(&direction, "direction", "d", `Direction of the dependency tree, defaults to "LR"`)
 	rootCmd.PersistentFlags().BoolVarP(&useFixedStrings, "fixed-strings", "F", false, "Treat all patterns as literals instead of as regular expressions.")
