@@ -17,11 +17,18 @@ func computeDependencyChains(
 		wg     = new(sync.WaitGroup)
 	)
 
-	for module, deps := range goModGraph {
+	moduleToParents := make(map[ModuleName][]ModuleName)
+	for mod, deps := range goModGraph {
 		for _, dep := range deps {
-			if isModuleMatching(dep) {
+			moduleToParents[dep] = append(moduleToParents[dep], mod)
+		}
+	}
+
+	for module, parents := range moduleToParents {
+		if isModuleMatching(module) {
+			for _, parent := range parents {
 				wg.Add(1)
-				go computeDependencyChain(ctx, wg, goModGraph, rootModule, module, NewDependencyChain(dep), chains)
+				go computeDependencyChain(ctx, wg, moduleToParents, rootModule, parent, NewDependencyChain(module), chains)
 			}
 		}
 	}
@@ -37,7 +44,7 @@ func computeDependencyChains(
 func computeDependencyChain(
 	ctx context.Context,
 	wg *sync.WaitGroup,
-	goModGraph map[ModuleName][]ModuleName,
+	moduleToParents map[ModuleName][]ModuleName,
 	rootModule ModuleName,
 	module ModuleName,
 	chain DependencyChain,
@@ -62,10 +69,8 @@ func computeDependencyChain(
 		return
 	}
 
-	for parent, deps := range goModGraph {
-		if slices.Contains(deps, module) {
-			wg.Add(1)
-			go computeDependencyChain(ctx, wg, goModGraph, rootModule, parent, chain, chains)
-		}
+	for _, parent := range moduleToParents[module] {
+		wg.Add(1)
+		go computeDependencyChain(ctx, wg, moduleToParents, rootModule, parent, chain, chains)
 	}
 }
